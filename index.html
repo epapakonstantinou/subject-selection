@@ -5,57 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Επιλογή Μαθήματος 1ου Εξαμήνου - Τμήμα Βιοτεχνολογίας, ΓΠΑ</title>
   <style>
-    :root{
-      --bg:#0b0b0b; --panel:#151515; --ink:#eaeaea; --muted:#a9a9a9; --accent:#7dd3fc; --ok:#22c55e;
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; background:var(--bg); color:var(--ink);
+    :root{ --bg:#0b0b0b; --panel:#151515; --ink:#eaeaea; --muted:#a9a9a9; --accent:#7dd3fc; --radius:16px }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{ margin:0; background:var(--bg); color:var(--ink);
       font:18px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
-      display:grid; place-items:start;
-    }
+      display:grid; place-items:start; }
     header{ width:100%; padding:32px 16px 8px; text-align:center }
     header h1{ margin:0 0 6px; font-weight:500; letter-spacing:.2px; font-size:1.8rem }
     header p{ margin:0; color:var(--muted); font-size:1.1rem }
-
     .wrap{ width:min(900px,92vw); margin:24px auto 64px; padding:0 8px }
-    .card{
-      background:var(--panel); border-radius:var(--radius); padding:32px; box-shadow:0 10px 30px rgba(0,0,0,.45);
-      border:1px solid rgba(255,255,255,.06);
-    }
-
+    .card{ background:var(--panel); border-radius:16px; padding:32px; box-shadow:0 10px 30px rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.06) }
     form{ display:grid; gap:22px }
     label{ display:block; font-size:1rem; color:var(--muted); margin-bottom:6px }
-    input, select{
-      width:100%; background:#0f0f10; color:var(--ink); border:1px solid rgba(255,255,255,.08);
-      border-radius:12px; padding:14px 16px; outline:none; font-size:1rem;
-      transition:border-color .2s, box-shadow .2s;
-    }
+    input, select{ width:100%; background:#0f0f10; color:var(--ink); border:1px solid rgba(255,255,255,.08);
+      border-radius:12px; padding:14px 16px; outline:none; font-size:1rem; transition:border-color .2s, box-shadow .2s }
     input:focus, select:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(125,211,252,.15) }
-
-    .row{ display:grid; grid-template-columns:1fr 1fr; gap:20px }
-    @media (max-width:720px){ .row{ grid-template-columns:1fr } }
-
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:20px } @media (max-width:720px){ .row{ grid-template-columns:1fr } }
     .actions{ display:flex; gap:12px; align-items:center; margin-top:10px }
-    button{
-      border:0; border-radius:12px; padding:14px 20px; font-weight:600; cursor:pointer; font-size:1.05rem; color:#0b0b0b;
-      background:linear-gradient(180deg, #b9e6ff, #7dd3fc);
-      transition:transform .06s ease-in-out, filter .2s;
-    }
-    button:hover{ filter:brightness(1.05) }
-    button:active{ transform:translateY(1px) }
-    button[disabled]{ opacity:.6; cursor:not-allowed }
-
+    button{ border:0; border-radius:12px; padding:14px 20px; font-weight:600; cursor:pointer; font-size:1.05rem; color:#0b0b0b;
+      background:linear-gradient(180deg, #b9e6ff, #7dd3fc); transition:transform .06s ease-in-out, filter .2s }
+    button:hover{ filter:brightness(1.05) } button:active{ transform:translateY(1px) } button[disabled]{ opacity:.6; cursor:not-allowed }
     .msg{ display:none; padding:14px 16px; border-radius:12px; font-size:1rem }
     .msg.show{ display:block }
-    .msg.ok{ background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.35); color:#bbf7d0 }
-    .msg.err{ background:rgba(255,107,107,.12); border:1px solid rgba(255,107,107,.35); color:#fecaca }
-
+    .ok{  background:rgba(34,197,94,.12);  border:1px solid rgba(34,197,94,.35);  color:#bbf7d0 }
+    .err{ background:rgba(255,107,107,.12); border:1px solid rgba(255,107,107,.35); color:#fecaca }
     .fineprint{ color:var(--muted); font-size:.85rem; margin-top:8px }
-
     .hp{ position:absolute; left:-9999px; opacity:0; pointer-events:none }
+
+    /* Deadline banner */
+    .deadline { margin: 0 auto 16px; padding: 12px 14px; border-radius: 12px; font-size: .95rem;
+      border: 1px solid rgba(255,255,255,.12); }
+    .deadline.ok   { background: rgba(125,211,252,.10); color:#e0f2fe; }
+    .deadline.warn { background: rgba(251,191,36,.12);  color:#fde68a; }
+    .deadline.crit { background: rgba(248,113,113,.15); color:#fecaca; }
+    .deadline.exp  { background: rgba(148,163,184,.12); color:#cbd5e1; }
   </style>
 </head>
 <body>
@@ -67,16 +51,12 @@
   <main class="wrap">
     <section class="card">
 
-      <!-- Hidden iframe so the form doesn't navigate away -->
-      <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+      <!-- Deadline banner -->
+      <div id="deadlineBanner" class="deadline ok">
+        Η προθεσμία λήγει σε <strong><span id="ddlText">—</span></strong>.
+      </div>
 
-      <form id="subjectForm"
-            method="POST"
-            action="https://script.google.com/macros/s/AKfycbyeFYTKaKc-f6ckbNRZLAnvtQsfuYi10KtirmFMIhpEC7Iym3N2DqWbygN3pbk84HwZbg/exec"
-            target="hidden_iframe"
-            onsubmit="return beforeSubmit();">
-
-        <!-- Honeypot -->
+      <form id="subjectForm" novalidate>
         <input class="hp" type="text" name="website" autocomplete="off" tabindex="-1" aria-hidden="true" />
 
         <div class="row">
@@ -105,68 +85,123 @@
           </div>
         </div>
 
-        <!-- Fields that the script expects based on headers -->
-        <input type="hidden" name="name" id="fullName" />
-        <input type="hidden" name="clientTimestamp" id="clientTimestamp" />
-
         <div class="actions">
           <button id="submitBtn" type="submit">Υποβολή Επιλογής</button>
           <span class="hint">Η επιβεβαίωση θα εμφανιστεί εδώ.</span>
         </div>
 
-        <p id="okMsg" class="msg ok" role="status">Ευχαριστούμε! Η επιλογή σας υποβλήθηκε με επιτυχία.</p>
-        <p id="errMsg" class="msg err" role="alert">Λυπούμαστε, κάτι πήγε στραβά. Δοκιμάστε ξανά σε λίγο.</p>
+        <p id="okMsg"  class="msg ok"  role="status">Ευχαριστούμε! Η επιλογή σας υποβλήθηκε με επιτυχία.</p>
+        <p id="dupMsg" class="msg err" role="alert">Το email έχει ήδη υποβάλει επιλογή.</p>
+        <p id="clsMsg" class="msg err" role="alert">Η προθεσμία έχει λήξει και η φόρμα δεν δέχεται άλλες υποβολές.</p>
+        <p id="errMsg" class="msg err" role="alert">Κάτι πήγε στραβά. Δοκιμάστε ξανά σε λίγο.</p>
+
         <p class="fineprint">Με την υποβολή, συμφωνείτε με την επεξεργασία των δεδομένων σας για σκοπούς κατανομής μαθημάτων.</p>
       </form>
     </section>
   </main>
 
   <script>
-    const DEDUP_KEY = "subject-choice-2025"; // only affects local duplicate blocking
+    // ====== SET THESE ======
+    const ACTION_URL   = "https://script.google.com/macros/s/AKfycbycPYsFkwO2JBATGFwupX9g0KgJvVwmKUzL5TVqNaBuaO7Qk_V1dukh4_sgQmQEvXnUPQ/exec";  // e.g. https://script.google.com/macros/s/…/exec
+    const DEADLINE_ISO = "2025-10-01T23:59:59+03:00";  // must match Code.gs
+    // =======================
 
-    const form     = document.getElementById('subjectForm');
-    const okMsg    = document.getElementById('okMsg');
-    const errMsg   = document.getElementById('errMsg');
-    const fullName = document.getElementById('fullName');
-    const ts       = document.getElementById('clientTimestamp');
+    const DEDUP_KEY = "subject-choice-2025"; // client-side soft block (server enforces true block)
 
-    function showMsg(el){ el.classList.add('show'); }
-    function hideMsg(el){ el.classList.remove('show'); }
+    const form      = document.getElementById('subjectForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const okMsg  = document.getElementById('okMsg');
+    const dupMsg = document.getElementById('dupMsg');
+    const clsMsg = document.getElementById('clsMsg');
+    const errMsg = document.getElementById('errMsg');
+    const msgs = [okMsg, dupMsg, clsMsg, errMsg];
+    const show = el => { msgs.forEach(m => m.classList.remove('show')); el.classList.add('show'); };
 
-    function beforeSubmit(){
-      hideMsg(okMsg); hideMsg(errMsg);
+    // ----- Deadline banner / auto lock -----
+    const banner  = document.getElementById('deadlineBanner');
+    const ddlText = document.getElementById('ddlText');
 
-      // basic validity + honeypot
-      if (!form.checkValidity()) { form.reportValidity(); return false; }
-      if (form.querySelector('.hp').value) { return false; }
-
-      // local de-dup
-      const email = document.getElementById('email').value.trim().toLowerCase();
-      if (localStorage.getItem(`${DEDUP_KEY}:${email}`)) {
-        showMsg(okMsg);
-        okMsg.textContent = 'Έχετε ήδη υποβάλει επιλογή. Ευχαριστούμε!';
-        return false;
-      }
-
-      // populate hidden fields the sheet expects
-      const first = document.getElementById('firstName').value.trim();
-      const last  = document.getElementById('lastName').value.trim();
-      fullName.value = `${first} ${last}`.trim();
-      ts.value = new Date().toISOString();
-
-      // After the hidden iframe finishes loading (i.e., submission completed),
-      // show success and clear the form.
-      const iframe = document.getElementById('hidden_iframe');
-      const onLoad = () => {
-        showMsg(okMsg);
-        form.reset();
-        localStorage.setItem(`${DEDUP_KEY}:${email}`, '1');
-        iframe.removeEventListener('load', onLoad);
-      };
-      iframe.addEventListener('load', onLoad);
-
-      return true; // proceed with normal POST to the web app
+    function lockForm() {
+      document.querySelectorAll('#subjectForm input, #subjectForm select, #subjectForm button')
+        .forEach(el => el.disabled = true);
+      banner.className = 'deadline exp';
+      ddlText.textContent = 'η προθεσμία έχει λήξει';
     }
+    function renderCountdown() {
+      const ddl = new Date(DEADLINE_ISO);
+      if (isNaN(ddl.getTime())) { banner.style.display='none'; return; }
+      const ms = ddl - Date.now();
+      if (ms <= 0) { lockForm(); return; }
+      const totalM = Math.floor(ms/60000);
+      const d = Math.floor(totalM/(60*24));
+      const h = Math.floor((totalM%(60*24))/60);
+      const m = totalM%60;
+      const parts = [];
+      if (d>0) parts.push(`${d} ${d===1?'ημέρα':'ημέρες'}`);
+      if (h>0) parts.push(`${h} ${h===1?'ώρα':'ώρες'}`);
+      parts.push(`${m} ${m===1?'λεπτό':'λεπτά'}`);
+      ddlText.textContent = parts.join(' · ');
+      banner.className = 'deadline ok';
+      if (ms <= 72*60*60*1000) banner.className = 'deadline warn';
+      if (ms <= 24*60*60*1000) banner.className = 'deadline crit';
+    }
+    renderCountdown();
+    setInterval(renderCountdown, 30_000);
+
+    // ----- Submit handler (form-encoded, reads server JSON) -----
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msgs.forEach(m => m.classList.remove('show'));
+
+      // deadline guard on client
+      if (Date.now() >= new Date(DEADLINE_ISO).getTime()) { lockForm(); show(clsMsg); return; }
+
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      if (form.querySelector('.hp').value) { return; } // honeypot
+
+      const email = form.email.value.trim().toLowerCase();
+      if (localStorage.getItem(`${DEDUP_KEY}:${email}`)) { show(dupMsg); return; }
+
+      submitBtn.disabled = true; submitBtn.textContent = 'Υποβολή…';
+
+      const payload = {
+        name: `${form.firstName.value.trim()} ${form.lastName.value.trim()}`.trim(),
+        firstName: form.firstName.value.trim(),
+        lastName: form.lastName.value.trim(),
+        email,
+        subject: form.subject.value,
+        clientTimestamp: new Date().toISOString()
+      };
+
+      try {
+        const res = await fetch(ACTION_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: new URLSearchParams(payload).toString()
+        });
+
+        const txt = await res.text();
+        let json = null; try { json = JSON.parse(txt); } catch {}
+        if (!res.ok || !json) throw new Error('bad_response');
+
+        if (json.result === 'success') {
+          show(okMsg); form.reset();
+          localStorage.setItem(`${DEDUP_KEY}:${email}`, '1');
+        } else if (json.result === 'duplicate') {
+          show(dupMsg);
+          localStorage.setItem(`${DEDUP_KEY}:${email}`, '1');
+        } else if (json.result === 'closed') {
+          lockForm(); show(clsMsg);
+        } else {
+          show(errMsg);
+        }
+      } catch (err) {
+        console.error(err);
+        show(errMsg);
+      } finally {
+        submitBtn.disabled = false; submitBtn.textContent = 'Υποβολή Επιλογής';
+      }
+    });
   </script>
 </body>
 </html>
