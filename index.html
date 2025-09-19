@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Επιλογή Μαθήματος 1ου Εξαμήνου - Τμήμα Βιοτεχνολογίας, ΓΠΑ</title>
+  <style>
+    :root{
+      --bg:#0b0b0b; --panel:#151515; --ink:#eaeaea; --muted:#a9a9a9; --accent:#7dd3fc; --ok:#22c55e;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--ink);
+      font:18px/1.6 system-ui,-apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial;
+      display:grid; place-items:start;
+    }
+    header{ width:100%; padding:32px 16px 8px; text-align:center }
+    header h1{ margin:0 0 6px; font-weight:500; letter-spacing:.2px; font-size:1.8rem }
+    header p{ margin:0; color:var(--muted); font-size:1.1rem }
+
+    .wrap{ width:min(900px,92vw); margin:24px auto 64px; padding:0 8px }
+    .card{
+      background:var(--panel); border-radius:var(--radius); padding:32px; box-shadow:0 10px 30px rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    form{ display:grid; gap:22px }
+    label{ display:block; font-size:1rem; color:var(--muted); margin-bottom:6px }
+    input, select{
+      width:100%; background:#0f0f10; color:var(--ink);
+      border:1px solid rgba(255,255,255,.08); border-radius:12px;
+      padding:14px 16px; outline:none; font-size:1rem;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    input:focus, select:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(125,211,252,.15) }
+
+    .row{ display:grid; grid-template-columns:1fr 1fr; gap:20px }
+    @media (max-width:720px){ .row{ grid-template-columns:1fr } }
+
+    .hint{ font-size:.9rem; color:var(--muted) }
+    .actions{ display:flex; gap:12px; align-items:center; margin-top:10px }
+    button{
+      border:0; border-radius:12px; padding:14px 20px; font-weight:600; cursor:pointer; font-size:1.05rem;
+      color:#0b0b0b; background:linear-gradient(180deg, #b9e6ff, #7dd3fc);
+      transition:transform .06s ease-in-out, filter .2s;
+    }
+    button:hover{ filter:brightness(1.05) }
+    button:active{ transform:translateY(1px) }
+    button[disabled]{ opacity:.6; cursor:not-allowed }
+
+    .msg{ display:none; padding:14px 16px; border-radius:12px; font-size:1rem }
+    .msg.show{ display:block }
+    .msg.ok{ background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.35); color:#bbf7d0 }
+    .msg.err{ background:rgba(255,107,107,.12); border:1px solid rgba(255,107,107,.35); color:#fecaca }
+
+    .fineprint{ color:var(--muted); font-size:.85rem; margin-top:8px }
+
+    .hp{ position:absolute; left:-9999px; opacity:0; pointer-events:none }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Επιλογή Μαθήματος 1ου Εξαμήνου - Τμήμα Βιοτεχνολογίας, ΓΠΑ</h1>
+    <p>Επιλέξτε το μάθημα σας από τη λίστα και υποβάλετε τα στοιχεία σας.</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <form id="subjectForm" novalidate>
+        <input class="hp" type="text" name="website" autocomplete="off" tabindex="-1" aria-hidden="true" />
+
+        <div class="row">
+          <div>
+            <label for="firstName">Όνομα</label>
+            <input id="firstName" name="firstName" type="text" required />
+          </div>
+          <div>
+            <label for="lastName">Επώνυμο</label>
+            <input id="lastName" name="lastName" type="text" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="name@university.edu" required />
+          </div>
+          <div>
+            <label for="subject">Μάθημα Επιλογής</label>
+            <select id="subject" name="subject" required>
+              <option value="" selected disabled>— Επιλέξτε μάθημα —</option>
+              <option>ΕΙΣΑΓΩΓΗ ΣΤΗ ΓΕΩΡΓΙΑ (κωδ. 321)</option>
+              <option>ΙΣΤΟΡΙΑ ΤΗΣ ΣΥΓΧΡΟΝΗΣ ΒΙΟΛΟΓΙΑΣ (κωδ. 293)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="submitBtn" type="submit">Υποβολή Επιλογής</button>
+          <span class="hint">Η επιβεβαίωση θα εμφανιστεί εδώ.</span>
+        </div>
+
+        <p id="okMsg" class="msg ok" role="status">Ευχαριστούμε! Η επιλογή σας υποβλήθηκε με επιτυχία.</p>
+        <p id="errMsg" class="msg err" role="alert">Λυπούμαστε, κάτι πήγε στραβά. Δοκιμάστε ξανά σε λίγο.</p>
+        <p class="fineprint">Με την υποβολή, συμφωνείτε με την επεξεργασία των δεδομένων σας για σκοπούς κατανομής μαθημάτων.</p>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const ACTION_URL = "https://script.google.com/macros/s/AKfycbwnrfKw17p2goHHBq0lgohvpl3zwziLw22UQoSbsJcTSHCGw3kl6S6aWoV2XirFmtzK/exec";
+    const DEDUP_KEY = "subject-choice-2025";
+
+    const form = document.getElementById('subjectForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const okMsg = document.getElementById('okMsg');
+    const errMsg = document.getElementById('errMsg');
+
+    function showMsg(el){ el.classList.add('show'); }
+    function hideMsg(el){ el.classList.remove('show'); }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMsg(okMsg); hideMsg(errMsg);
+
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      if (form.querySelector('.hp').value) { return; }
+
+      const email = form.email.value.trim().toLowerCase();
+      if (localStorage.getItem(`${DEDUP_KEY}:${email}`)) {
+        showMsg(okMsg);
+        okMsg.textContent = 'Έχετε ήδη υποβάλει επιλογή. Ευχαριστούμε!';
+        return;
+      }
+
+      submitBtn.disabled = true; submitBtn.textContent = 'Υποβολή…';
+
+      const payload = {
+        name: `${form.firstName.value.trim()} ${form.lastName.value.trim()}`.trim(),
+        firstName: form.firstName.value.trim(),
+        lastName: form.lastName.value.trim(),
+        email,
+        subject: form.subject.value,
+        clientTimestamp: new Date().toISOString()
+      };
+
+      try {
+        const res = await fetch(ACTION_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Bad response: ' + res.status);
+
+        showMsg(okMsg);
+        form.reset();
+        localStorage.setItem(`${DEDUP_KEY}:${email}`, '1');
+      } catch (err) {
+        console.error(err);
+        showMsg(errMsg);
+      } finally {
+        submitBtn.disabled = false; submitBtn.textContent = 'Υποβολή Επιλογής';
+      }
+    });
+  </script>
+</body>
+</html>
